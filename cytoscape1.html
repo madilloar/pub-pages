@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cytoscape example</title>
+
+  <link rel="stylesheet" type="text/css"
+    href="https://cdnjs.cloudflare.com/ajax/libs/cytoscape-panzoom/2.5.3/cytoscape.js-panzoom.css">
+  <link rel="stylesheet" type="text/css"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.9.0/css/all.min.css">
+
+  <script src="https://unpkg.com/jquery@3.4.1/dist/jquery.min.js"></script>
+  <script src="https://unpkg.com/cytoscape@3.8.1/dist/cytoscape.min.js"></script>
+  <script src="https://unpkg.com/numeric@1.2.6/numeric-1.2.6.js"></script>
+  <script src="https://unpkg.com/layout-base@1.0.1/layout-base.js"></script>
+  <script src="https://unpkg.com/cose-base@1.0.0/cose-base.js"></script>
+
+  <!--cytoscape-fcose:Dependencies
+    Cytoscape.js ^3.2.0
+    numeric.js ^1.2.6
+    cose-base ^1.0.0
+  -->
+  <script src="https://unpkg.com/cytoscape-fcose@1.0.0/cytoscape-fcose.js"></script>
+
+  <!-- cytoscape-panzoom:Dependencies
+    jQuery ^1.4 || ^2.0 || ^3.0
+    Cytoscape.js ^2.0.0 || ^3.0.0
+    Font Awesome 4 (for automatic icons), or you can specify your own class names for icons
+  -->
+  <script src="https://unpkg.com/cytoscape-panzoom@2.5.3/cytoscape-panzoom.js"></script>
+
+  <style>
+    body {
+      font-family: helvetica neue, helvetica, liberation sans, arial, sans-serif;
+      font-size: 10px;
+    }
+
+    #IdCytoscape {
+      position: absolute;
+      top: 150px;
+      left: 0px;
+      width: 100%;
+      height: 100%;
+      z-index: 999;
+      background-color: #e9e9e9;
+    }
+  </style>
+  <script>
+    var CytLayout = (function () {
+      var _setLayout = function (cy, layoutName) {
+        var layout = {
+          name: layoutName,
+          fit: true,
+          animate: true
+        };
+        cy.layout(layout).run();
+        return layout;
+      };
+      return {
+        setLeyout: _setLayout
+      };
+    })();
+    document.addEventListener("DOMContentLoaded", function () {
+      var setStyles = function (nodes, edges) {
+        // ノードのスタイル
+        nodes.forEach(function (node) {
+          var data = node.json().data;
+          if (!data.type) {
+            // 子ノードのサイズとスタイル
+            /*
+                        // ノードのサイズをランダムで求めていますが、普通はノードの属性から値を取ると思います。
+                        var width = [30, 70, 110];
+                        var size = width[Math.floor(Math.random() * 3)];
+                        node.css("width", size);
+                        node.css("height", size);
+            */
+            // ラベルの幅と高さのサイズにします。
+            node.css("width", "label");
+            node.css("height", "label");
+            node.css("padding", "20px");
+            node.css("content", data.name || data.id);
+            node.css("text-justification", "left")
+            node.css("text-valign", "center");
+            node.css("text-halign", "center");
+            node.css("text-wrap", "wrap");
+            node.css("shape", "round-rectangle");
+            node.css("background-color", "#ffcb4f");
+          } else if ((data.type).match(/^g/)) {
+            // 親ノードのスタイル
+            var colors = ["#B2EDCE", "#4eb7d9", "#ffdaf4"];
+            node.css("content", data.name);
+            node.css("text-valign", "top");
+            node.css("background-color", colors[Math.floor(Math.random() * 3)]);
+          }
+        });
+        // エッヂのスタイル
+        edges.forEach(function (edge) {
+          var data = edge.json().data;
+          edge.css("content", data.id);
+          edge.css("curve-style", "taxi");
+          edge.css("target-arrow-shape", "triangle");
+        });
+      };
+      var cy = cytoscape({
+        container: $("#IdCytoscape"),
+        ready: function () {
+          setStyles(this.nodes(), this.edges());
+        },
+        elements: eval($("#IdElements").val()),
+      });
+      cy.panzoom({});
+      CytLayout.setLeyout(cy, $("#IdLayout").val());
+      // cyのセレクタ"node"でイベントを拾う
+      cy.on("cxttap", "node", function (evt) {
+        var tgt = evt.target;
+        var data = tgt.json().data;
+        var id = data["id"];
+        var m = "";
+        m += "ノードの右クリックイベントでアラートしてますが、GETとかPOSTするのもよいかも。";
+        m += "{id:" + id + ", x:" + tgt.position("x") + ", y:" + tgt.position("y") + "}";
+        alert(m);
+      });
+      // cy要素自体でイベントを拾う
+      cy.on("tap", function (evt) {
+        var tgt = evt.target;
+        if (tgt === cy) {
+          // cyをtapした場合は、ノードを追加
+          cy.add({
+            data: { id: 'new' + Math.round(Math.random() * 100) },
+            position: {
+              x: evt.position.x,
+              y: evt.position.y
+            }
+          });
+        } else {
+          // ノードをタップした場合
+          var data = tgt.data();
+          var m = "";
+          m += "ノードのクリックイベントで属性を追加してます。\n";
+          m += "{name+id:" + data["id"] + ",\nx:" + tgt.position("x") + ", y:" + tgt.position("y") + "}";
+          data.name = m;
+        }
+        setStyles(cy.nodes(), cy.edges());
+        CytLayout.setLeyout(cy, $("#IdLayout").val());
+      });
+      $("#IdLayout").change(function () {
+        CytLayout.setLeyout(cy, $("#IdLayout").val());
+      });
+      $("#IdBtnRead").click(function () {
+        var elements = cy.elements();
+        cy.remove(elements);
+        cy.add(eval($("#IdElements").val()));
+        setStyles(cy.nodes(), cy.edges());
+        CytLayout.setLeyout(cy, $("#IdLayout").val());
+      });
+      $("#IdBtnSave").click(function () {
+        var s = "";
+        var nodes = cy.nodes();
+        nodes.forEach(function (node) {
+          s += JSON.stringify(node.json());
+          s += "\n";
+        });
+        $("#IdElementsPosition").val(s);
+      });
+    });
+  </script>
+</head>
+
+<body>
+  <h1>Cytoscape demo</h1>
+  <table border="1">
+    <tr>
+      <td>
+        <label for="IdLayout">Layout:</label>
+        <select name="NmLayout" id="IdLayout">
+          <option value="fcose" selected>fcose</option>
+          <option value="grid">grid</option>
+          <option value="random">random</option>
+          <option value="circle">circle</option>
+          <option value="concentric">concentric</option>
+          <option value="breadthfirst">breadthfirst</option>
+          <option value="cose">cose</option>
+        </select>
+      </td>
+      <td>
+        <button id="IdBtnRead">読込</button>
+        <textarea name="NmElements" id="IdElements" cols="30" rows="5">
+                    [
+                    { group: 'nodes', data: { id: 'n0' } },
+                    { group: 'nodes', data: { id: 'n1' } },
+                    { group: 'nodes', data: { id: 'n2' } },
+                    { group: 'nodes', data: { id: 'n3' } },
+                    { group: 'nodes', data: { id: 'n4', parent: 'n37' } },
+                    { group: 'nodes', data: { id: 'n5' } },
+                    { group: 'nodes', data: { id: 'n6' } },
+                    { group: 'nodes', data: { id: 'n7', parent: 'n37' } },
+                    { group: 'nodes', data: { id: 'n8', parent: 'n37' } },
+                    { group: 'nodes', data: { id: 'n9', parent: 'n37' } },
+                    { group: 'nodes', data: { id: 'n10', parent: 'n38' } },
+                    { group: 'nodes', data: { id: 'n12' } },
+                    { group: 'nodes', data: { id: 'n13' } },
+                    { group: 'nodes', data: { id: 'n14' } },
+                    { group: 'nodes', data: { id: 'n15' } },
+                    { group: 'nodes', data: { id: 'n16' } },
+                    { group: 'nodes', data: { id: 'n17' } },
+                    { group: 'nodes', data: { id: 'n18' } },
+                    { group: 'nodes', data: { id: 'n19' } },
+                    { group: 'nodes', data: { id: 'n20' } },
+                    { group: 'nodes', data: { id: 'n21' } },
+                    { group: 'nodes', data: { id: 'n22' } },
+                    { group: 'nodes', data: { id: 'n23' } },
+                    { group: 'nodes', data: { id: 'n24', name: 'テキスト\n折り返しの\nテスト', parent: 'n39' } },
+                    { group: 'nodes', data: { id: 'n25', parent: 'n39' } },
+                    { group: 'nodes', data: { id: 'n26', parent: 'n42' } },
+                    { group: 'nodes', data: { id: 'n27', parent: 'n42' } },
+                    { group: 'nodes', data: { id: 'n28', parent: 'n42' } },
+                    { group: 'nodes', data: { id: 'n29', parent: 'n40' } },
+                    { group: 'nodes', data: { id: 'n31', parent: 'n41' } },
+                    { group: 'nodes', data: { id: 'n32', parent: 'n41' } },
+                    { group: 'nodes', data: { id: 'n33', parent: 'n41' } },
+                    { group: 'nodes', data: { id: 'n34', parent: 'n41' } },
+                    { group: 'nodes', data: { id: 'n35', parent: 'n41' } },
+                    { group: 'nodes', data: { id: 'n36', parent: 'n41' } },
+                    { group: 'nodes', data: { id: 'n37', type: 'g37', name: 'グループ37' } },
+                    { group: 'nodes', data: { id: 'n38', type: 'g38', name: 'グループ38' } },
+                    { group: 'nodes', data: { id: 'n39', type: 'g39', name: 'グループ39', parent: 'n43' } },
+                    { group: 'nodes', data: { id: 'n40', type: 'g40', name: 'グループ40', parent: 'n42' } },
+                    { group: 'nodes', data: { id: 'n41', type: 'g41', name: 'グループ41', parent: 'n42' } },
+                    { group: 'nodes', data: { id: 'n42', type: 'g42', name: 'グループ42', parent: 'n43' } },
+                    { group: 'nodes', data: { id: 'n43', type: 'g43', name: 'グループ43' } },
+                    { group: 'edges', data: { id: 'e0', source: 'n0', target: 'n1' } },
+                    { group: 'edges', data: { id: 'e1', source: 'n1', target: 'n2' } },
+                    { group: 'edges', data: { id: 'e2', source: 'n2', target: 'n3' } },
+                    { group: 'edges', data: { id: 'e3', source: 'n0', target: 'n3' } },
+                    { group: 'edges', data: { id: 'e4', source: 'n1', target: 'n4' } },
+                    { group: 'edges', data: { id: 'e5', source: 'n2', target: 'n4' } },
+                    { group: 'edges', data: { id: 'e6', source: 'n4', target: 'n5' } },
+                    { group: 'edges', data: { id: 'e7', source: 'n5', target: 'n6' } },
+                    { group: 'edges', data: { id: 'e8', source: 'n4', target: 'n6' } },
+                    { group: 'edges', data: { id: 'e9', source: 'n4', target: 'n7' } },
+                    { group: 'edges', data: { id: 'e10', source: 'n7', target: 'n8' } },
+                    { group: 'edges', data: { id: 'e11', source: 'n8', target: 'n9' } },
+                    { group: 'edges', data: { id: 'e12', source: 'n7', target: 'n9' } },
+                    { group: 'edges', data: { id: 'e13', source: 'n13', target: 'n14' } },
+                    { group: 'edges', data: { id: 'e14', source: 'n12', target: 'n14' } },
+                    { group: 'edges', data: { id: 'e15', source: 'n14', target: 'n15' } },
+                    { group: 'edges', data: { id: 'e16', source: 'n14', target: 'n16' } },
+                    { group: 'edges', data: { id: 'e17', source: 'n15', target: 'n17' } },
+                    { group: 'edges', data: { id: 'e18', source: 'n17', target: 'n18' } },
+                    { group: 'edges', data: { id: 'e19', source: 'n18', target: 'n19' } },
+                    { group: 'edges', data: { id: 'e20', source: 'n17', target: 'n20' } },
+                    { group: 'edges', data: { id: 'e21', source: 'n19', target: 'n20' } },
+                    { group: 'edges', data: { id: 'e22', source: 'n16', target: 'n20' } },
+                    { group: 'edges', data: { id: 'e23', source: 'n20', target: 'n21' } },
+                    { group: 'edges', data: { id: 'e25', source: 'n23', target: 'n24' } },
+                    { group: 'edges', data: { id: 'e26', source: 'n24', target: 'n25' } },
+                    { group: 'edges', data: { id: 'e27', source: 'n26', target: 'n38' } },
+                    { group: 'edges', data: { id: 'e29', source: 'n26', target: 'n39' } },
+                    { group: 'edges', data: { id: 'e30', source: 'n26', target: 'n27' } },
+                    { group: 'edges', data: { id: 'e31', source: 'n26', target: 'n28' } },
+                    { group: 'edges', data: { id: 'e33', source: 'n21', target: 'n31' } },
+                    { group: 'edges', data: { id: 'e35', source: 'n31', target: 'n33' } },
+                    { group: 'edges', data: { id: 'e36', source: 'n31', target: 'n34' } },
+                    { group: 'edges', data: { id: 'e37', source: 'n33', target: 'n34' } },
+                    { group: 'edges', data: { id: 'e38', source: 'n32', target: 'n35' } },
+                    { group: 'edges', data: { id: 'e39', source: 'n32', target: 'n36' } },
+                    { group: 'edges', data: { id: 'e40', source: 'n16', target: 'n40' } }
+                    ]
+        </textarea>
+      </td>
+      <td id="IdElementPositions">
+        <button id="IdBtnSave">保存</button>
+        <textarea name="NmElementsPosition" id="IdElementsPosition" cols="30" rows="5"></textarea>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="3">
+        <div id="IdCytoscape"></div>
+      </td>
+    </tr>
+  </table>
+
+</body>
+
+</html>
