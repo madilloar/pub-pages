@@ -110,6 +110,7 @@
         },
         elements: eval($("#IdElements").val()),
       });
+      // パン、ズームイン／ズームアウトコントロールの配置
       cy.panzoom({});
       CytLayout.setLeyout(cy, $("#IdLayout").val());
       // cyのセレクタ"node"でイベントを拾う
