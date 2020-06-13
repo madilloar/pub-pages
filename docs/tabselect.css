@@ -1,4 +1,3 @@
-<style>
 /*.tab_wrap{width:500px; margin:80px auto;}*/
 .tab_wrap
 input[type="radio"]{display:none;}
@@ -17,4 +16,3 @@ input[type="radio"]{display:none;}
 #tab2:checked ~ .panel_area #panel2{display:block;}
 #tab3:checked ~ .tab_area .tab3_label{background:#fff; color:#000;}
 #tab3:checked ~ .panel_area #panel3{display:block;}
-</style>
