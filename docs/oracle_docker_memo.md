@@ -185,8 +185,10 @@ impdp d001/d001@ORCLPDB1 directory='DIR_DATA_PUMP' dumpfile=exp.dmp schemas=d001
 ```
 
 ## impdp 異なるDBから出力したdmpファイルのインポート
-impdp d001/d001@ORCLPDB1 directory='DIR_DATA_PUMP' dumpfile=other_system_d001.dmp read_schema=d001:d001 remap_tablespace=OTHER_DATA001:USERS,OTHER_INDEX001:USERS logfile=import.log table_exists_action=truncate
 
+```
+impdp d001/d001@ORCLPDB1 directory='DIR_DATA_PUMP' dumpfile=other_system_d001.dmp read_schema=d001:d001 remap_tablespace=OTHER_DATA001:USERS,OTHER_INDEX001:USERS logfile=import.log table_exists_action=truncate
+```
 
 
 ## パスワード変更
