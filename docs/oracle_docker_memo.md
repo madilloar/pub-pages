@@ -31,10 +31,10 @@ curl -L https://github.com/oracle/docker-images/archive/refs/heads/main.zip --ou
 ```
 
 ダウンロード
-https://www.oracle.com/webapps/redirect/signon?nexturl=https://download.oracle.com/otn/linux/oracle19c/190000/LINUX.X64_193000_db_home.zip
+[OTNからダウンロード](https://www.oracle.com/webapps/redirect/signon?nexturl=https://download.oracle.com/otn/linux/oracle19c/190000/LINUX.X64_193000_db_home.zip)
 
 ```
-cp /mnt/c/users/madilloar/downloads/LINUX.X64_193000_db_home.zip ./
+cp /mnt/c/users/madilloar/downloads/LINUX.X64_193000_db_home.zip ~/prj/DB/oracle/docker-images/OracleDatabase/SingleInstance/dockerfiles/19.3.0
 ./buildContainerImage.sh -v 19.3.0 -e -i
 ```
 
