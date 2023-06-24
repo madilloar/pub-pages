@@ -30,7 +30,7 @@ curl -L https://github.com/oracle/docker-images/archive/refs/heads/main.zip --ou
 ./buildContainerImage.sh -v 18.4.0 -x -i
 ```
 
-ダウンロード
+OTNからエンタープライズ版インストールイメージのZIPファイルをダウンロード。
 [OTNからダウンロード](https://www.oracle.com/webapps/redirect/signon?nexturl=https://download.oracle.com/otn/linux/oracle19c/190000/LINUX.X64_193000_db_home.zip)
 
 ```
