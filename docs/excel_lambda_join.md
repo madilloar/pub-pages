@@ -58,9 +58,9 @@ _left_only_keysで特定されたキーに対応する左側のテーブル（_l
     _left_unique_keys,   UNIQUE(_left_join_keys),
     _right_unique_keys,  UNIQUE(_right_join_keys),
     _inner_join_keys,    FILTER(_left_unique_keys,  ISNUMBER(BYROW(_left_unique_keys,  LAMBDA(_left_key,  IFERROR(MATCH(TRUE, EXACT(_left_key,  _right_unique_keys), 0), FALSE))))),
-    _left_only_records,  INDEX(_left,  BYROW(_inner_join_keys, LAMBDA(d, MATCH(TRUE, EXACT(d, _left_join_keys), 0))), SEQUENCE(1, COLUMNS(_left))),
-    _right_only_records, INDEX(_right, BYROW(_inner_join_keys, LAMBDA(d, MATCH(TRUE, EXACT(d, _right_join_keys), 0))), SEQUENCE(1, COLUMNS(_right))),
-    _return,             HSTACK(_left_only_records, _right_only_records),
+    _left_match_records,  INDEX(_left,  BYROW(_inner_join_keys, LAMBDA(d, MATCH(TRUE, EXACT(d, _left_join_keys), 0))), SEQUENCE(1, COLUMNS(_left))),
+    _right_match_records, INDEX(_right, BYROW(_inner_join_keys, LAMBDA(d, MATCH(TRUE, EXACT(d, _right_join_keys), 0))), SEQUENCE(1, COLUMNS(_right))),
+    _return,             HSTACK(_left_match_records, _right_match_records),
     _return
   )
 )(T_before, {1,2}, T_after, {1,2})
