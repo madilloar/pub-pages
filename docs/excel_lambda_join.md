@@ -19,7 +19,7 @@
 )(T_before, {1,2}, T_after, {1,2})
 ```
 ## 難解な部分の解説:
-### _left_only_keys:
+### ``_left_only_keys, FILTER(_left_unique_keys,  NOT(ISNUMBER(BYROW(_left_unique_keys,  LAMBDA(_left_key,  IFERROR(MATCH(TRUE, EXACT(_left_key,  _right_unique_keys), 0), FALSE))))))``:
 左側のテーブル(_left)には存在するが、右側のテーブル(_right)には存在しない一意のキーを見つけるための処理です。ここでのキーとは、特定の列または列の組み合わせによって形成される一意の識別子です。
 
 以下のステップでこの処理が行われます：
@@ -34,7 +34,7 @@
 
 結果として、_left_only_keysには左側のテーブルにのみ存在し、右側のテーブルには存在しないキーが格納されます。この処理により、二つのテーブル間で不一致のあるデータを特定することができます。
 
-### _left_only_records
+### ``_left_only_records, IFERROR(INDEX(_left, BYROW(_left_only_keys, LAMBDA(d, MATCH(TRUE, EXACT(d, _left_join_keys), 0))), SEQUENCE(1, COLUMNS(_left))), REPT(" ", COLUMNS(_left)))``:
 _left_only_keysで特定されたキーに対応する左側のテーブル（_left）のレコードを取得する処理です。ここでの「レコード」とは、テーブルの行のことを指します。
 
 以下のステップでこの処理が行われます：
