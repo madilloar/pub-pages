@@ -9,10 +9,10 @@
     _right_unique_keys,  UNIQUE(_right_join_keys),
     _left_only_keys,     FILTER(_left_unique_keys,  NOT(ISNUMBER(BYROW(_left_unique_keys,  LAMBDA(_left_key,  IFERROR(MATCH(TRUE, EXACT(_left_key,  _right_unique_keys), 0), FALSE)))))),
     _right_only_keys,    FILTER(_right_unique_keys, NOT(ISNUMBER(BYROW(_right_unique_keys, LAMBDA(_right_key, IFERROR(MATCH(TRUE, EXACT(_right_key, _left_unique_keys),  0), FALSE)))))),
-    _left_only_records,  IFERROR(INDEX(_left, BYROW(_left_only_keys, LAMBDA(d, MATCH(TRUE, EXACT(d, _left_join_keys), 0))), SEQUENCE(1, COLUMNS(_left))), REPT(" ", COLUMNS(_left))),
-    _right_only_records, IFERROR(INDEX(_right, BYROW(_right_only_keys, LAMBDA(d, MATCH(TRUE, EXACT(d, _right_join_keys), 0))), SEQUENCE(1, COLUMNS(_right))), REPT(" ", COLUMNS(_right))),
-    _left_null_records,  IFERROR(HSTACK(_left_only_records, IF(LEN(_left_only_records), REPT(" ", COLUMNS(_right)), "")), ""),
-    _right_null_records, IFERROR(HSTACK(IF(LEN(_right_only_records), REPT(" ", COLUMNS(_left)), ""), _right_only_records), ""),
+    _left_only_records,  INDEX(_left,  BYROW(_left_only_keys,  LAMBDA(d, MATCH(TRUE, EXACT(d, _left_join_keys),  0))), SEQUENCE(1, COLUMNS(_left))),
+    _right_only_records, INDEX(_right, BYROW(_right_only_keys, LAMBDA(d, MATCH(TRUE, EXACT(d, _right_join_keys), 0))), SEQUENCE(1, COLUMNS(_right))),
+    _left_null_records,  HSTACK(_left_only_records, REPT("",SEQUENCE(ROWS(_left_only_records), COLUMNS(_right)))),
+    _right_null_records, HSTACK(REPT("",SEQUENCE(ROWS(_right_only_records), COLUMNS(_left))),  _right_only_records),
     _return,             VSTACK(_left_null_records, _right_null_records),
    _return
   )
@@ -34,18 +34,17 @@
 
 結果として、_left_only_keysには左側のテーブルにのみ存在し、右側のテーブルには存在しないキーが格納されます。この処理により、二つのテーブル間で不一致のあるデータを特定することができます。
 
-### ``_left_only_records, IFERROR(INDEX(_left, BYROW(_left_only_keys, LAMBDA(d, MATCH(TRUE, EXACT(d, _left_join_keys), 0))), SEQUENCE(1, COLUMNS(_left))), REPT(" ", COLUMNS(_left)))``:
+### ``_left_only_records, INDEX(_left, BYROW(_left_only_keys, LAMBDA(d, MATCH(TRUE, EXACT(d, _left_join_keys), 0))), SEQUENCE(1, COLUMNS(_left))),``:
 _left_only_keysで特定されたキーに対応する左側のテーブル（_left）のレコードを取得する処理です。ここでの「レコード」とは、テーブルの行のことを指します。
 
 以下のステップでこの処理が行われます：
 
 1. ``BYROW(_left_only_keys, LAMBDA(d, MATCH(TRUE, EXACT(d, _left_join_keys), 0)))``:
 - BYROW関数を使用して、_left_only_keysの各キーに対して処理を行います。
-- LAMBDA関数が各キー（d）を受け取り、_left_join_keys内での位置をEXACT関数とMATCH関数を使って検索します。
+- LAMBDA関数が各キー(d)を受け取り、_left_join_keys内での位置をEXACT関数とMATCH関数を使って検索します。
 - EXACT関数は大文字小文字を区別して比較を行い、MATCH関数は一致する位置を返します。
 2. ``INDEX(_left, ..., SEQUENCE(1, COLUMNS(_left)))``:
 - INDEX関数を使用して、_leftテーブルから対応する行を取得します。
 - ``SEQUENCE(1, COLUMNS(_left))``は、取得する行のすべての列を指定しています。
-3. ``IFERROR(..., REPT(" ", COLUMNS(_left)))``:
-IFERROR関数は、INDEX関数がエラーを返した場合（つまり一致する行がない場合）に、左側のテーブルの列数と同じ数の空白を返します。
+
 この処理により、_left_only_recordsには、右側のテーブルには存在しない左側のテーブルのレコードが格納されます。これにより、左側のテーブルにのみ存在するデータを特定し、それらを処理することができます。
