@@ -1,4 +1,6 @@
 # 対称差集合
+
+```
 =LAMBDA(_left,_left_keys,_right,_right_keys,
   LET(
     _left_join_keys,     BYROW(_left,  LAMBDA(_left_row,  TEXTJOIN(CHAR(9), TRUE, INDEX(_left_row, ,  _left_keys )))),
@@ -15,3 +17,4 @@
    _return
   )
 )(T_before, {1,2}, T_after, {1,2})
+```
