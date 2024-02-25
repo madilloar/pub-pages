@@ -48,3 +48,20 @@ _left_only_keysで特定されたキーに対応する左側のテーブル（_l
 - ``SEQUENCE(1, COLUMNS(_left))``は、取得する行のすべての列を指定しています。
 
 この処理により、_left_only_recordsには、右側のテーブルには存在しない左側のテーブルのレコードが格納されます。これにより、左側のテーブルにのみ存在するデータを特定し、それらを処理することができます。
+
+# INNER JOIN
+```
+=LAMBDA(_left, _left_keys, _right, _right_keys,
+  LET(
+    _left_join_keys,     BYROW(_left,  LAMBDA(_left_row,  TEXTJOIN(CHAR(9), TRUE, INDEX(_left_row, ,  _left_keys )))),
+    _right_join_keys,    BYROW(_right, LAMBDA(_right_row, TEXTJOIN(CHAR(9), TRUE, INDEX(_right_row, , _right_keys)))),
+    _left_unique_keys,   UNIQUE(_left_join_keys),
+    _right_unique_keys,  UNIQUE(_right_join_keys),
+    _inner_join_keys,    FILTER(_left_unique_keys,  ISNUMBER(BYROW(_left_unique_keys,  LAMBDA(_left_key,  IFERROR(MATCH(TRUE, EXACT(_left_key,  _right_unique_keys), 0), FALSE))))),
+    _left_only_records,  INDEX(_left,  BYROW(_inner_join_keys, LAMBDA(d, MATCH(TRUE, EXACT(d, _left_join_keys), 0))), SEQUENCE(1, COLUMNS(_left))),
+    _right_only_records, INDEX(_right, BYROW(_inner_join_keys, LAMBDA(d, MATCH(TRUE, EXACT(d, _right_join_keys), 0))), SEQUENCE(1, COLUMNS(_right))),
+    _return,             HSTACK(_left_only_records, _right_only_records),
+    _return
+  )
+)(T_before, {1,2}, T_after, {1,2})
+```
