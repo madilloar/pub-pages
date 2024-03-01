@@ -28,13 +28,12 @@ YMW:
     _year, YEAR(_date),
     _month, MONTH(_date),
     _day, DAY(_date),
+    _week, WEEKNUM(_date, 2),
     _month_start, DATE(_year, _month, 1),
     _month_start_week_day, WEEKDAY(_month_start, 2),
     _month_start_week, WEEKNUM(_month_start, 2),
-    _week, WEEKNUM(_date, 2),
     _month_week, IF(_week < _month_start_week, _week + 52 - _month_start_week + 1, _week - _month_start_week + 1),
-    _return, TEXT(_year,"000") &TEXT(_month,"00") &_month_week
-    _return
+    TEXT(_year,"000") &TEXT(_month,"00") &_month_week
   )
-)
+)(D3)
 ```
