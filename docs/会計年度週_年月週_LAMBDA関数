@@ -17,9 +17,12 @@ LET(
  )
 )
 ```
+
 会計年度週と構造がすごく似てる。
 年月週
 YMW:
+
+```
 =LAMBDA(_date,
   LET(
     _year, YEAR(_date),
