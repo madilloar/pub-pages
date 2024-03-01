@@ -30,10 +30,9 @@ YMW:
     _day, DAY(_date),
     _week, WEEKNUM(_date, 2),
     _month_start, DATE(_year, _month, 1),
-    _month_start_week_day, WEEKDAY(_month_start, 2),
     _month_start_week, WEEKNUM(_month_start, 2),
     _month_week, IF(_week < _month_start_week, _week + 52 - _month_start_week + 1, _week - _month_start_week + 1),
     TEXT(_year,"000") &TEXT(_month,"00") &_month_week
   )
-)(D3)
+)(D2)
 ```
