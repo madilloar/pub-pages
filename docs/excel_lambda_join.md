@@ -107,3 +107,25 @@ _left_only_keysで特定されたキーに対応する左側のテーブル（_l
   )
 )(T_before, {1,2}, T_after, {1,2})
 ```
+
+
+# LEFT JOINの別バージョン検討中
+JOINキーにプライマリキーが含まれない場合への対応。NULLレコードを先に入れて、CROSS JOINを作ってから始める。
+
+```
+=LAMBDA(_cross_joined,_left,_right,
+  LET(
+    _inner_join,   BYROW(EXACT(_left, _right), LAMBDA(_r, AND(_r))),
+    _inner_joined, FILTER(_cross_joined, _inner_join),
+    _left_only,    BYROW(NOT(EXACT(_left,  0)), LAMBDA(_r, AND(_r))),
+    _right_only,   BYROW(NOT(EXACT(_right, 0)), LAMBDA(_r, AND(_r))),
+    _left_join,    BYROW(HSTACK(EXACT(_left_only, TRUE), EXACT(_right_only, FALSE)), LAMBDA(_r, AND(_r))),
+    _left_joined,  FILTER(_cross_joined, _left_join),
+    _right_joined, FILTER(_cross_joined, _right_only),
+    _left_unique,  UNIQUE(CHOOSECOLS(VSTACK(_inner_joined, _left_joined), {1,2,3,4})),
+    _right_unique, UNIQUE(CHOOSECOLS(VSTACK(_inner_joined, _right_joined), {5,6,7})),
+    _return,       HSTACK(_left_unique, _right_unique),
+    _return
+  )
+)(J2:P37, J2:K37, N2:O37)
+```
