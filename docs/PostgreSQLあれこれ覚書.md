@@ -28,7 +28,7 @@ networks:
 
 ## dockerでpsqlを動かしてPostgreSQLサーバに接続する
 ```bash
-docker run -it --rm -v ./data:/tmp --network postgresql_my-posgre-network postgres:latest psql -h  my-posgre-db -U postgres
+docker run -it --rm -v ./work:/tmp --network postgresql_my-posgre-network postgres:latest psql -h  my-posgre-db -U postgres
 ```
 
 - ``-it``: ''i''がコンテナの標準入力にローカルから入力できりょうにして、``t``が疑似ターミナルを割り当てている。
