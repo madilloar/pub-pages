@@ -12,7 +12,7 @@ services:
   my-posgre-db:
     image: postgres:latest
     volumes:
-      - ./data:/tmp
+      - ./data:/var/lib/postgresql/data
     environment:
       - TZ=Asia/Tokyo
       - POSTGRES_PASSWORD=postgres
