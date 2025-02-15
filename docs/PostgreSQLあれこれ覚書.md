@@ -32,7 +32,7 @@ docker run -it --rm -v ./work:/tmp --network postgresql_my-posgre-network postgr
 ```
 
 - ``-it``: ''i''がコンテナの標準入力にローカルから入力できりょうにして、``t``が疑似ターミナルを割り当てている。
-- ``-v ./data:tmp``: ローカルのカレントディレクトリの``data``ディレクトリと``psql``コマンドを動かしているコンテナの``/tmp``ディレクトリを接続している。
+- ``-v ./work:tmp``: ローカルのカレントディレクトリの``work``ディレクトリと``psql``コマンドを動かしているコンテナの``/tmp``ディレクトリを接続している。
 - ``--network postgresql_my-posgre-network``: ``psql``コマンドが接続するネットワークを指定。docker-composeに記述しているもの。接頭辞に``postgresql_``が付いているのは、``docker-compose.yml``ファイルが存在しているディレクトリが``postgresql_``のため。
 - ``postgres:latest``: 起動するコンテナイメージ
 - ``psql``: 起動したコンテナイメージの中にある``psql``コマンド
