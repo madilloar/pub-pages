@@ -38,3 +38,30 @@ docker run -it --rm -v ./data:/tmp --network postgresql_my-posgre-network postgr
 - ``psql``: 起動したコンテナイメージの中にある``psql``コマンド
 - ``-h my-postgre-db``: YAMLファイルに書いているサービスの名前「my-postgre-db」
 - ``-U postgres``: DBに接続する際のユーザID
+
+
+## psqlコマンドあれこれ
+### 現在接続しているデータベース
+```sql
+\conninfo
+```
+
+### データベース一覧
+```sql
+\l
+```
+
+### テーブル一覧
+```sql
+\dt *
+```
+
+### データベース接続
+```sql
+\c <データベース名>
+```
+### SELECTクエリの結果をファイルに出力
+この例では/tmpディレクトリに出力している。上記の [dockerでpsqlを動かしてPostgreSQLサーバに接続する](#dockerでpsqlを動かしてPostgreSQLサーバに接続する) 際に``-v``オプションで``/tmp``ディレクトリをローカルPCのディレクトリに接続していれば、ローカルPCにresult.txtが作られる。
+```
+\COPY (SELECT * FROM your_table) TO '/tmp/result.txt' WITH CSV HEADER;
+```
