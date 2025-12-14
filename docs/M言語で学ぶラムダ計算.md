@@ -195,6 +195,7 @@ MyIf = (condition, trueResult, falseResult) => condition(trueResult, falseResult
 2. **M言語の仕様:** M言語の関数は、引数として「関数」も受け取れますが、「文字列」や「数字」も受け取れる（`any` 型）ため。
 
 `MyTrue` や `MyFalse` **は「選ぶ人」：**
+
 `MyTrue` や `MyFalse` は、渡されたものが「関数」なのか「文字列」なのかを気にしません。 **単に、どの引数を選ぶかです。**
 
 - **MyTrue:** 「箱が2つあるね。中身は知らないけど、 **左の箱** をそのまま渡すよ」
